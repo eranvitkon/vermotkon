@@ -23,7 +23,7 @@
   .hint { font-size: 11px; color: #999; text-align: center; margin-bottom: 4px; }
 
   .cocktails-title { font-size: 13px; color: #666; margin-bottom: 10px; font-weight: 500; }
-  .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   .cc { background: #fff; border: 1.5px solid #002288; border-radius: 16px; padding: 12px 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.1s; }
   .cc:active { transform: scale(0.96); }
   .cc.sel { background: #002288; }
@@ -32,6 +32,9 @@
   .cem { font-size: 26px; margin-bottom: 5px; }
   .cn { font-size: 13px; font-weight: 600; color: #002288; margin-bottom: 3px; }
   .cd { font-size: 10px; color: #888; line-height: 1.4; }
+
+  .surprise-btn { width: 100%; padding: 13px; background: #fff; color: #002288; border: 1.5px dashed #002288; border-radius: 14px; font-size: 15px; cursor: pointer; margin-bottom: 10px; -webkit-tap-highlight-color: transparent; }
+  .surprise-btn:active { background: #e8f0ff; }
 
   .obtn { width: 100%; padding: 16px; background: #002288; color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s; }
   .obtn:disabled { opacity: 0.35; cursor: default; }
@@ -44,14 +47,14 @@
   .success p { font-size: 14px; color: #888; }
   .id-badge { background: #002288; border-radius: 18px; padding: 18px 28px; margin: 18px 0; display: inline-block; }
   .id-badge .iname { font-size: 26px; font-weight: 600; color: #fff; }
-  .id-badge .ick { font-size: 14px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+  .id-badge .ick { font-size: 14px; color: rgba(255,255,255,0.75); margin-top: 6px; }
   .qnum-label { font-size: 13px; color: #888; margin-top: 8px; }
   .qnum { font-size: 64px; font-weight: 700; color: #002288; line-height: 1; margin: 6px 0 12px; }
   .back-btn { margin-top: 20px; padding: 12px 28px; border: 1.5px solid #002288; color: #002288; background: none; border-radius: 12px; cursor: pointer; font-size: 15px; -webkit-tap-highlight-color: transparent; }
 
   .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; display: inline-block; margin-left: 6px; vertical-align: middle; }
   .conn-dot.on { background: #2a9d5c; }
-  .conn-status { text-align: center; font-size: 11px; color: #aaa; padding: 6px; }
+  .conn-status { text-align: center; font-size: 11px; color: #aaa; padding: 8px; }
 
   @keyframes rollNames { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
   .rolling { animation: rollNames 0.1s ease 4; }
@@ -80,6 +83,7 @@
   <div class="section">
     <div class="cocktails-title">בחר קוקטיל</div>
     <div class="cgrid" id="cgrid"></div>
+    <button class="surprise-btn" onclick="surpriseCocktail()">🎲 הפתע אותי — הגרל קוקטיל</button>
     <button class="obtn" id="obtn" disabled onclick="placeOrder()">בחר קוקטיל להזמנה</button>
   </div>
 
@@ -88,7 +92,7 @@
 
 <div class="success" id="successView">
   <div class="sico">🍸</div>
-  <h2 id="sTitle">הזמנה נקלטה!</h2>
+  <h2>הזמנה נקלטה!</h2>
   <p>הערב אתה</p>
   <div class="id-badge">
     <div class="iname" id="sName"></div>
@@ -108,12 +112,12 @@ const names = [
   'סטרוק','גמליאל','סילמן','גולדה','פולה','ציפי'
 ];
 const cocktails = [
-  {id:1, e:'🥂', n:'Tel Aviv Spritz', d:'וורמוט, פרוסקו, אשכולית, רוזמרין'},
-  {id:2, e:'🍋', n:'Lemon Garden',    d:'וורמוט, ג\'ין, לימון, נענע, סודה'},
-  {id:3, e:'🌿', n:'Rosemary Tonic',  d:'וורמוט, וודקה, טוניק, רוזמרין'},
-  {id:4, e:'🍊', n:'Campari Fizz',    d:'וורמוט, קמפרי, פרוסקו, אשכולית'},
-  {id:5, e:'🌸', n:'Mediterranean Mule', d:'וורמוט, וודקה, לימון, נענע, סודה'},
-  {id:6, e:'🍋', n:'Bitter Citrus',   d:'וורמוט, קמפרי, לימון, טוניק'},
+  {id:1, e:'🥂', n:'תל אביב שפריץ',    d:'וורמוט, פרוסקו, אשכולית, רוזמרין'},
+  {id:2, e:'🍋', n:'לימון מלימן',       d:'וורמוט, ג\'ין, לימון, נענע, סודה'},
+  {id:3, e:'🌿', n:'טוניק קרית שמונה',  d:'וורמוט, וודקה, טוניק, רוזמרין'},
+  {id:4, e:'🍊', n:'קמפרי חיפה',        d:'וורמוט, קמפרי, פרוסקו, אשכולית'},
+  {id:5, e:'🌸', n:'פרד צפתי',          d:'וורמוט, וודקה, לימון, נענע, סודה'},
+  {id:6, e:'🍷', n:'ביטר קיסריה',       d:'וורמוט, קמפרי, לימון, טוניק'},
 ];
 
 let sel = null, currentName = null, ws = null;
@@ -121,8 +125,15 @@ let sel = null, currentName = null, ws = null;
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   ws = new WebSocket(`${proto}://${location.host}`);
-  ws.onopen = () => { document.getElementById('dot').classList.add('on'); document.getElementById('connText').textContent = 'מחובר'; };
-  ws.onclose = () => { document.getElementById('dot').classList.remove('on'); document.getElementById('connText').textContent = 'מנותק — מנסה שוב...'; setTimeout(connect, 3000); };
+  ws.onopen = () => {
+    document.getElementById('dot').classList.add('on');
+    document.getElementById('connText').textContent = 'מחובר';
+  };
+  ws.onclose = () => {
+    document.getElementById('dot').classList.remove('on');
+    document.getElementById('connText').textContent = 'מנותק — מנסה שוב...';
+    setTimeout(connect, 3000);
+  };
 }
 
 function spinName() {
@@ -141,6 +152,18 @@ function spinName() {
       checkBtn();
     }
   }, 75);
+}
+
+function surpriseCocktail() {
+  const random = cocktails[Math.floor(Math.random() * cocktails.length)];
+  document.querySelectorAll('.cc').forEach(x => x.classList.remove('sel'));
+  const card = document.getElementById('c' + random.id);
+  if (card) {
+    card.classList.add('sel');
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  sel = random.id;
+  checkBtn();
 }
 
 function renderCocktails() {
@@ -183,13 +206,14 @@ function placeOrder() {
   document.getElementById('sName').textContent = currentName;
   document.getElementById('sCocktail').textContent = c.e + ' ' + c.n;
 
-  ws.onmessage = (ev) => {
+  const handler = (ev) => {
     const msg = JSON.parse(ev.data);
     if (msg.type === 'new_order' && msg.order.name === currentName) {
       document.getElementById('sNum').textContent = msg.order.id;
-      ws.onmessage = null;
+      ws.removeEventListener('message', handler);
     }
   };
+  ws.addEventListener('message', handler);
 
   document.getElementById('mainView').style.display = 'none';
   document.getElementById('successView').classList.add('show');
@@ -203,7 +227,6 @@ function resetView() {
   document.querySelectorAll('.cc').forEach(x => x.classList.remove('sel'));
   document.getElementById('successView').classList.remove('show');
   document.getElementById('mainView').style.display = 'block';
-  connect();
 }
 
 renderCocktails();

@@ -6,11 +6,10 @@
 <title>ורמוטקון — ברמן</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f0f0; min-height: 100vh; direction: rtl; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f0f0; min-height: 100vh; direction: rtl; padding-bottom: 48px; }
 
   .header { background: #002288; padding: 16px; display: flex; align-items: center; justify-content: space-between; }
   .header h1 { color: #fff; font-size: 20px; font-weight: 600; }
-  .header-right { display: flex; align-items: center; gap: 10px; }
   .live-badge { background: rgba(255,255,255,0.2); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
   .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #2aff7a; }
   .stripe { height: 5px; background: repeating-linear-gradient(to right, #002288 0, #002288 33%, #fff 33%, #fff 66%, #002288 66%, #002288 100%); }
@@ -35,15 +34,15 @@
   .order-cocktail { font-size: 13px; color: #555; margin-top: 2px; }
   .order-time { font-size: 11px; color: #bbb; margin-top: 2px; }
   .done-btn { padding: 7px 14px; border: 1.5px solid #002288; color: #002288; background: none; border-radius: 10px; font-size: 13px; cursor: pointer; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-  .done-btn.completed { background: #002288; color: #fff; border-color: #002288; }
+  .done-btn.completed { background: #002288; color: #fff; }
   .done-btn:active { opacity: 0.7; }
 
   .empty { text-align: center; padding: 48px 20px; color: #bbb; }
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
   .empty p { font-size: 14px; }
 
-  .new-flash { animation: flash 0.5s ease; }
-  @keyframes flash { 0%{background:#e8f0ff} 100%{background:#fff} }
+  .new-flash { animation: flash 0.6s ease; }
+  @keyframes flash { 0%{background:#dce8ff} 100%{background:#fff} }
 
   .conn-bar { text-align: center; font-size: 11px; color: #aaa; padding: 8px; background: #f8f8f8; border-top: 0.5px solid #e0e0e0; position: fixed; bottom: 0; left: 0; right: 0; }
   .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; display: inline-block; margin-left: 5px; vertical-align: middle; }
@@ -54,9 +53,7 @@
 
 <div class="header">
   <h1>ורמוטקון 🍸 ברמן</h1>
-  <div class="header-right">
-    <div class="live-badge"><div class="live-dot"></div>חי</div>
-  </div>
+  <div class="live-badge"><div class="live-dot"></div>חי</div>
 </div>
 <div class="stripe"></div>
 
@@ -90,23 +87,15 @@ function connect() {
     document.getElementById('dot').classList.add('on');
     document.getElementById('connText').textContent = 'מחובר לשרת';
   };
-
   ws.onclose = () => {
     document.getElementById('dot').classList.remove('on');
     document.getElementById('connText').textContent = 'מנותק — מנסה שוב...';
     setTimeout(connect, 3000);
   };
-
   ws.onmessage = (ev) => {
     const msg = JSON.parse(ev.data);
-    if (msg.type === 'init') {
-      orders = msg.orders;
-      render();
-    }
-    if (msg.type === 'new_order') {
-      orders.unshift(msg.order);
-      render(msg.order.id);
-    }
+    if (msg.type === 'init') { orders = msg.orders; render(); }
+    if (msg.type === 'new_order') { orders.unshift(msg.order); render(msg.order.id); }
     if (msg.type === 'toggle_done') {
       const o = orders.find(x => x.id === msg.id);
       if (o) o.done = msg.done;
@@ -116,15 +105,13 @@ function connect() {
 }
 
 function toggleDone(id) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  if (ws && ws.readyState === WebSocket.OPEN)
     ws.send(JSON.stringify({ type: 'toggle_done', id }));
-  }
 }
 
 function clearDone() {
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  if (ws && ws.readyState === WebSocket.OPEN)
     ws.send(JSON.stringify({ type: 'clear_done' }));
-  }
 }
 
 function render(newId) {
@@ -140,14 +127,14 @@ function render(newId) {
     return;
   }
   el.innerHTML = orders.map(o => `
-    <div class="order-item ${o.done ? 'done' : ''} ${o.id === newId ? 'new-flash' : ''}" id="order-${o.id}">
+    <div class="order-item ${o.done ? 'done' : ''} ${o.id === newId ? 'new-flash' : ''}">
       <div class="order-num ${o.done ? 'done-num' : ''}">${o.id}</div>
       <div class="order-info">
         <div class="order-name">${o.name}</div>
         <div class="order-cocktail">${o.cocktail.e} ${o.cocktail.n}</div>
         <div class="order-time">${o.time}</div>
       </div>
-      <button class="done-btn ${o.done ? 'completed' : ''}" onclick="toggleDone(${o.id})">${o.done ? 'בוצע' : 'סיים'}</button>
+      <button class="done-btn ${o.done ? 'completed' : ''}" onclick="toggleDone(${o.id})">${o.done ? 'בוצע ✓' : 'סיים'}</button>
     </div>`).join('');
 }
 
