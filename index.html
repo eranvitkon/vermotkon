@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ורמוטקון 🍸</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f0f0; min-height: 100vh; direction: rtl; }
+
+  .header { background: #002288; padding: 20px 16px 14px; text-align: center; }
+  .header h1 { color: #fff; font-size: 26px; font-weight: 600; letter-spacing: 2px; }
+  .header p { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 4px; }
+  .stripe { height: 6px; background: repeating-linear-gradient(to right, #002288 0, #002288 33%, #fff 33%, #fff 66%, #002288 66%, #002288 100%); }
+
+  .section { padding: 14px 12px; }
+
+  .name-card { background: #002288; border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .name-label { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
+  .name-val { font-size: 22px; font-weight: 600; color: #fff; min-height: 32px; }
+  .spin-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 15px; cursor: pointer; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+  .spin-btn:active { background: rgba(255,255,255,0.4); }
+  .hint { font-size: 11px; color: #999; text-align: center; margin-bottom: 4px; }
+
+  .cocktails-title { font-size: 13px; color: #666; margin-bottom: 10px; font-weight: 500; }
+  .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .cc { background: #fff; border: 1.5px solid #002288; border-radius: 16px; padding: 12px 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.1s; }
+  .cc:active { transform: scale(0.96); }
+  .cc.sel { background: #002288; }
+  .cc.sel .cn { color: #fff; }
+  .cc.sel .cd { color: rgba(255,255,255,0.75); }
+  .cem { font-size: 26px; margin-bottom: 5px; }
+  .cn { font-size: 13px; font-weight: 600; color: #002288; margin-bottom: 3px; }
+  .cd { font-size: 10px; color: #888; line-height: 1.4; }
+
+  .obtn { width: 100%; padding: 16px; background: #002288; color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s; }
+  .obtn:disabled { opacity: 0.35; cursor: default; }
+  .obtn:active:not(:disabled) { opacity: 0.8; }
+
+  .success { display: none; padding: 40px 20px; text-align: center; min-height: 60vh; flex-direction: column; align-items: center; justify-content: center; }
+  .success.show { display: flex; }
+  .sico { font-size: 56px; margin-bottom: 16px; }
+  .success h2 { font-size: 22px; font-weight: 600; color: #002288; margin-bottom: 6px; }
+  .success p { font-size: 14px; color: #888; }
+  .id-badge { background: #002288; border-radius: 18px; padding: 18px 28px; margin: 18px 0; display: inline-block; }
+  .id-badge .iname { font-size: 26px; font-weight: 600; color: #fff; }
+  .id-badge .ick { font-size: 14px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+  .qnum-label { font-size: 13px; color: #888; margin-top: 8px; }
+  .qnum { font-size: 64px; font-weight: 700; color: #002288; line-height: 1; margin: 6px 0 12px; }
+  .back-btn { margin-top: 20px; padding: 12px 28px; border: 1.5px solid #002288; color: #002288; background: none; border-radius: 12px; cursor: pointer; font-size: 15px; -webkit-tap-highlight-color: transparent; }
+
+  .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; display: inline-block; margin-left: 6px; vertical-align: middle; }
+  .conn-dot.on { background: #2a9d5c; }
+  .conn-status { text-align: center; font-size: 11px; color: #aaa; padding: 6px; }
+
+  @keyframes rollNames { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+  .rolling { animation: rollNames 0.1s ease 4; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>ורמוטקון 🍸</h1>
+  <p>ערב קוקטיילים | וִיתְקוֹן</p>
+</div>
+<div class="stripe"></div>
+
+<div id="mainView">
+  <div class="section">
+    <div class="name-card">
+      <div>
+        <div class="name-label">הזהות שלך הערב</div>
+        <div class="name-val" id="assignedName">לחץ להגרלה ←</div>
+      </div>
+      <button class="spin-btn" onclick="spinName()">🎲 הגרל</button>
+    </div>
+    <div class="hint">כל אורח מקבל זהות ישראלית לערב</div>
+  </div>
+
+  <div class="section">
+    <div class="cocktails-title">בחר קוקטיל</div>
+    <div class="cgrid" id="cgrid"></div>
+    <button class="obtn" id="obtn" disabled onclick="placeOrder()">בחר קוקטיל להזמנה</button>
+  </div>
+
+  <div class="conn-status"><span class="conn-dot" id="dot"></span><span id="connText">מתחבר...</span></div>
+</div>
+
+<div class="success" id="successView">
+  <div class="sico">🍸</div>
+  <h2 id="sTitle">הזמנה נקלטה!</h2>
+  <p>הערב אתה</p>
+  <div class="id-badge">
+    <div class="iname" id="sName"></div>
+    <div class="ick" id="sCocktail"></div>
+  </div>
+  <div class="qnum-label">מספר בתור</div>
+  <div class="qnum" id="sNum">1</div>
+  <p>הברמן יקרא לך בקרוב 🇮🇱</p>
+  <button class="back-btn" onclick="resetView()">הזמנה נוספת</button>
+</div>
+
+<script>
+const names = [
+  'בן גוריון','בגין','פרס','שמיר','שרת','רבין',
+  'סמוטריץ','בן גביר','בת גביר','בנט','לפיד',
+  'גברת נתניהו','יל״ז','הרצי','גנץ',
+  'סטרוק','גמליאל','סילמן','גולדה','פולה','ציפי'
+];
+const cocktails = [
+  {id:1, e:'🥂', n:'Tel Aviv Spritz', d:'וורמוט, פרוסקו, אשכולית, רוזמרין'},
+  {id:2, e:'🍋', n:'Lemon Garden',    d:'וורמוט, ג\'ין, לימון, נענע, סודה'},
+  {id:3, e:'🌿', n:'Rosemary Tonic',  d:'וורמוט, וודקה, טוניק, רוזמרין'},
+  {id:4, e:'🍊', n:'Campari Fizz',    d:'וורמוט, קמפרי, פרוסקו, אשכולית'},
+  {id:5, e:'🌸', n:'Mediterranean Mule', d:'וורמוט, וודקה, לימון, נענע, סודה'},
+  {id:6, e:'🍋', n:'Bitter Citrus',   d:'וורמוט, קמפרי, לימון, טוניק'},
+];
+
+let sel = null, currentName = null, ws = null;
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}`);
+  ws.onopen = () => { document.getElementById('dot').classList.add('on'); document.getElementById('connText').textContent = 'מחובר'; };
+  ws.onclose = () => { document.getElementById('dot').classList.remove('on'); document.getElementById('connText').textContent = 'מנותק — מנסה שוב...'; setTimeout(connect, 3000); };
+}
+
+function spinName() {
+  const el = document.getElementById('assignedName');
+  el.classList.remove('rolling');
+  void el.offsetWidth;
+  el.classList.add('rolling');
+  let i = 0;
+  const iv = setInterval(() => {
+    el.textContent = names[Math.floor(Math.random() * names.length)];
+    i++;
+    if (i > 20) {
+      clearInterval(iv);
+      currentName = names[Math.floor(Math.random() * names.length)];
+      el.textContent = currentName;
+      checkBtn();
+    }
+  }, 75);
+}
+
+function renderCocktails() {
+  document.getElementById('cgrid').innerHTML = cocktails.map(c => `
+    <div class="cc" id="c${c.id}" onclick="pick(${c.id})">
+      <div class="cem">${c.e}</div>
+      <div class="cn">${c.n}</div>
+      <div class="cd">${c.d}</div>
+    </div>`).join('');
+}
+
+function pick(id) {
+  sel = id;
+  document.querySelectorAll('.cc').forEach(x => x.classList.remove('sel'));
+  document.getElementById('c' + id).classList.add('sel');
+  checkBtn();
+}
+
+function checkBtn() {
+  const btn = document.getElementById('obtn');
+  if (sel && currentName) {
+    const c = cocktails.find(x => x.id === sel);
+    btn.textContent = 'הזמן ' + c.n + ' כ' + currentName;
+    btn.disabled = false;
+  } else if (!currentName) {
+    btn.textContent = 'הגרל זהות תחילה 🎲';
+    btn.disabled = true;
+  } else {
+    btn.textContent = 'בחר קוקטיל להזמנה';
+    btn.disabled = true;
+  }
+}
+
+function placeOrder() {
+  if (!sel || !currentName) return;
+  const c = cocktails.find(x => x.id === sel);
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'new_order', name: currentName, cocktail: { e: c.e, n: c.n } }));
+  }
+  document.getElementById('sName').textContent = currentName;
+  document.getElementById('sCocktail').textContent = c.e + ' ' + c.n;
+
+  ws.onmessage = (ev) => {
+    const msg = JSON.parse(ev.data);
+    if (msg.type === 'new_order' && msg.order.name === currentName) {
+      document.getElementById('sNum').textContent = msg.order.id;
+      ws.onmessage = null;
+    }
+  };
+
+  document.getElementById('mainView').style.display = 'none';
+  document.getElementById('successView').classList.add('show');
+}
+
+function resetView() {
+  sel = null; currentName = null;
+  document.getElementById('assignedName').textContent = 'לחץ להגרלה ←';
+  document.getElementById('obtn').textContent = 'בחר קוקטיל להזמנה';
+  document.getElementById('obtn').disabled = true;
+  document.querySelectorAll('.cc').forEach(x => x.classList.remove('sel'));
+  document.getElementById('successView').classList.remove('show');
+  document.getElementById('mainView').style.display = 'block';
+  connect();
+}
+
+renderCocktails();
+connect();
+</script>
+</body>
+</html>
